@@ -1,9 +1,9 @@
 export interface MyPluginSettings {
-	mediumDevToken: string;
+	mySetting: string;
 	viewGuide: boolean;
 }
 
 export const DEFAULT_SETTINGS: MyPluginSettings = {
-	mediumDevToken: "default",
-	viewGuide: true,
-};
+	mySetting: 'default',
+	viewGuide: true
+}
