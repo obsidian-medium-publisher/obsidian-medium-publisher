@@ -5,7 +5,7 @@ import { SettingModule } from "./modules/setting/setting.module";
 
 // Remember to rename these classes and interfaces!
 
-export const PLUGIN_NAME = "obsidian-medium-publisher";
+export const PLUGIN_NAME = "tempName";
 
 export default class MediumPlugin extends Plugin {
 	iconModule: LogoModule = new LogoModule(this);
