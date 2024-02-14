@@ -20,9 +20,20 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setDesc('It\'s a secret')
 			.addText(text => text
 				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				// .setValue(this.plugin.settings.mySetting)
+				.setValue(this.plugin.settingModule.settings.mySetting)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settingModule.settings.mySetting = value;
+					await this.plugin.saveSettings();
+				}))
+			.setName('Medium Token')
+			.setDesc('Enter your Medium account token')
+			.addText(text => text
+				.setPlaceholder('Enter your token')
+				// .setValue(this.plugin.settings.mySetting)
+				.setValue(this.plugin.settingModule.settings.mySetting)
+				.onChange(async (value) => {
+					this.plugin.settingModule.settings.mySetting = value;
 					await this.plugin.saveSettings();
 				}));
 	}
