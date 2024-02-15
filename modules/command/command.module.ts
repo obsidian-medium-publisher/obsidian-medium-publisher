@@ -7,16 +7,9 @@ export class CommandModule {
 	constructor(app: MediumPlugin) {
 		this.plugin = app;
 
-
-
-		// ==================================
 		async function getUserId() {
 			const url = "https://api.medium.com/v1/me";
-			console.log('app', app);
-			console.log('app.settingModule', app.settingModule);
-			console.log('app.settingModule.settings', app.settingModule.settings);
 			const token = app.settingModule.settings.mySetting;
-			console.log('token: ', token);
 			const requestUrlParam: RequestUrlParam = {
 				method: "GET",
 					headers: {
@@ -27,123 +20,10 @@ export class CommandModule {
 				url,
 			};
 			const result = await requestUrl(requestUrlParam);
-			console.table(result);
-			console.log('your id is...', result?.json?.data?.id);
 			const id = result?.json?.data?.id;
-			// id를 MyPluginSettings의 userId에 저장
-			// this.plugin.settingModule.settings.userId = id;
 			if (id === undefined || id === '') throw Error('userId is undefined');
 			return id;
 		}
-		// ==================================
-
-		// setting값을 console.log하는 command 추가.
-		this.plugin.addCommand({
-			id: "console-log-my-setting",
-			name: "Console log my setting",
-			callback: () => {
-				console.log(this.plugin.settingModule.settings);
-			},
-		});
-
-		this.plugin.addCommand({
-			id: "what-is-my-token-value",
-			name: "Console log my token value",
-			callback: async () => {
-				const url = "https://api.medium.com/v1/me";
-				const token = this.plugin.settingModule.settings.mySetting;
-				console.log('token: ', token);
-
-				// try {
-				// 	const response = await fetch(url, {
-				// 		method: "GET",
-				// 		headers: {
-				// 			// Authorization: `Bearer ${token}`,
-				// 			Accept: 'application/json',
-				// 			'Content-Type': 'application/json',
-				// 		},
-				// 	});
-
-				// 	if (response.ok) {
-				// 		const data = await response.json();
-				// 		console.log(data);
-				// 	} else {
-				// 		console.error("Request failed:", response.status);
-				// 	}
-				// } catch (error) {
-				// 	console.error("An error occurred:", error);
-				// }
-
-				// require('request')('http://example.com/', (error: any, response: any, body: any) => {
-				// 		console.log(JSON.parse(body));
-				// });
-				const requestUrlParam: RequestUrlParam = {
-					method: "GET",
-						headers: {
-							'Authorization': `Bearer ${token}`,
-							'Accept': 'application/json',
-							'Content-Type': 'application/json',
-						},
-					url,
-				};
-				const result = await requestUrl(requestUrlParam);
-				console.table(result);
-				console.log('your id is...', result?.json?.data?.id);
-				const id = result?.json?.data?.id;
-				// id를 MyPluginSettings의 userId에 저장
-				this.plugin.settingModule.settings.userId = id;
-			},
-		});
-
-		// 고정된 포스팅객체 post
-		this.plugin.addCommand({
-			id: "publish-medium-post",
-			name: "Publish Medium Post",
-			callback: async () => {
-				const token = this.plugin.settingModule.settings.mySetting;
-				let userId = this.plugin.settingModule.settings.userId;
-				if (userId === '') userId = await getUserId();
-				const url = `https://api.medium.com/v1/users/${userId}/posts`;
-				const result = await requestUrl({
-					method: "POST",
-						headers: {
-							'Authorization': `Bearer ${token}`,
-							'Accept': 'application/json',
-							'Content-Type': 'application/json',
-						},
-					url,
-					body: JSON.stringify({
-						title: "Post by Obsidian plugin",
-						contentFormat: "html",
-						content: "<h1>Hello, Medium!</h1><p>This is my first Medium post!</p>",
-					}),
-				});
-				console.log(result);
-			},
-		});
-
-		// 포스팅 유틸함수1 - 현재켜져있는 md파일을 read하여 문자열로 반환하는 함수.
-		this.plugin.addCommand({
-			id: "read-active-md",
-			name: "Read active md file",
-			callback: async () => {
-				const { vault, workspace } = this.plugin.app;
-				const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-				// Handle case when the active view is not a Markdown file
-				if (!activeView) {
-					new Notice("Note not found. click the note and retry 🤔");
-					throw new Error("현재 노트가 열려있지 않습니다.");
-				}
-				// Get File
-				const currentFile = activeView.file as TFile;
-				// Parse Question
-				console.log('currentFile', currentFile);
-				const title = currentFile.basename;
-				const content = await this.plugin.app.vault.cachedRead(currentFile);
-				console.log('content', content);
-
-			}
-		});
 
 		// 포스팅커맨드
 		this.plugin.addCommand({
@@ -152,7 +32,6 @@ export class CommandModule {
 			callback: async () => {
 				const { vault, workspace } = this.plugin.app;
 				const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-				// Handle case when the active view is not a Markdown file
 				if (!activeView) {
 					new Notice("Note not found. click the note and retry 🤔");
 					throw new Error("현재 노트가 열려있지 않습니다.");
