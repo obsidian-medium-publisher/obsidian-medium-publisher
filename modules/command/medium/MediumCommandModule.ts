@@ -1,66 +1,28 @@
-import { Editor, MarkdownView, Notice, RequestUrlParam, TFile, requestUrl } from "obsidian";
-import { SampleModal } from "../logo/logo.modal";
-import MediumPlugin from "../../main";
+import {
+	Editor,
+	MarkdownView,
+	Notice,
+	RequestUrlParam,
+	TFile,
+	requestUrl,
+} from "obsidian";
+import { SampleModal } from "../../logo/logo.modal";
+import MediumPlugin from "../../../main";
+import { MediumApiHandler } from "../../api/medium/handler";
+import { PostActiveMdAsync } from "./callback/post-active-md";
 
-export class CommandModule {
-	private plugin: MediumPlugin;
+export class MediumCommandModule {
+	private readonly plugin: MediumPlugin;
+	private readonly mediumApiHandler: MediumApiHandler;
 	constructor(app: MediumPlugin) {
 		this.plugin = app;
-
-		async function getUserId() {
-			const url = "https://api.medium.com/v1/me";
-			const token = app.settingModule.settings.mySetting;
-			const requestUrlParam: RequestUrlParam = {
-				method: "GET",
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Accept': 'application/json',
-						'Content-Type': 'application/json',
-					},
-				url,
-			};
-			const result = await requestUrl(requestUrlParam);
-			const id = result?.json?.data?.id;
-			if (id === undefined || id === '') throw Error('userId is undefined');
-			return id;
-		}
+		this.mediumApiHandler = new MediumApiHandler(app);
 
 		// 포스팅커맨드
 		this.plugin.addCommand({
 			id: "post-active-md",
 			name: "post active md file to medium",
-			callback: async () => {
-				const { vault, workspace } = this.plugin.app;
-				const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!activeView) {
-					new Notice("Note not found. click the note and retry 🤔");
-					throw new Error("현재 노트가 열려있지 않습니다.");
-				}
-				const currentFile = activeView.file as TFile;
-				const title = currentFile.basename;
-				const content = await this.plugin.app.vault.cachedRead(currentFile);
-
-				const token = this.plugin.settingModule.settings.mySetting;
-				let userId = this.plugin.settingModule.settings.userId;
-				if (userId === '') userId = await getUserId();
-				const url = `https://api.medium.com/v1/users/${userId}/posts`;
-				const result = await requestUrl({
-					method: "POST",
-						headers: {
-							'Authorization': `Bearer ${token}`,
-							'Accept': 'application/json',
-							'Content-Type': 'application/json',
-						},
-					url,
-					body: JSON.stringify({
-						title,
-						contentFormat: "markdown",
-						content,
-					}),
-				});
-				console.log(result);
-				new Notice(`${title}파일이 성공적으로 Medium에 업로드되었습니다 :)`);
-			}
+			callback: PostActiveMdAsync(this.plugin, this.mediumApiHandler),
 		});
 
 		// 포스팅 유틸함수2 - 문자열에 이미지가 포함되어 있으면 이미지를 업로드하고 이미지의 url로 변경하는 함수.
@@ -77,12 +39,12 @@ export class CommandModule {
 				// console.log('token: ', token);
 				const requestUrlParam: RequestUrlParam = {
 					method: "GET",
-						headers: {
-							// 'Authorization': `Bearer ${token}`,
-							'Accept': 'application/json',
-							'Content-Type': 'application/json',
-							'Origin': 'https://velog.io'
-						},
+					headers: {
+						// 'Authorization': `Bearer ${token}`,
+						Accept: "application/json",
+						"Content-Type": "application/json",
+						Origin: "https://velog.io",
+					},
 					url,
 				};
 				const result = await requestUrl(requestUrlParam);
@@ -99,11 +61,11 @@ export class CommandModule {
 				// console.log('token: ', token);
 				const requestUrlParam: RequestUrlParam = {
 					method: "GET",
-						headers: {
-							// 'Authorization': `Bearer ${token}`,
-							'Accept': 'application/json',
-							'Content-Type': 'application/json',
-						},
+					headers: {
+						// 'Authorization': `Bearer ${token}`,
+						Accept: "application/json",
+						"Content-Type": "application/json",
+					},
 					url,
 				};
 				const result = await requestUrl(requestUrlParam);
