@@ -1,5 +1,5 @@
 export interface MyPluginSettings {
-	mySetting: string;
+	mediumDevToken: string;
 	viewGuide: boolean;
 	userId: string;
 }
