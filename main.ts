@@ -1,6 +1,6 @@
 import { Plugin } from "obsidian";
 import { LogoModule } from "./modules/logo/logo.module";
-import { CommandModule } from "./modules/command/command.module";
+import { MediumCommandModule } from "./modules/command/medium/MediumCommandModule";
 import { SettingModule } from "./modules/setting/setting.module";
 
 // Remember to rename these classes and interfaces!
@@ -9,7 +9,7 @@ export const PLUGIN_NAME = "obsidian-medium-publisher";
 
 export default class MediumPlugin extends Plugin {
 	iconModule: LogoModule = new LogoModule(this);
-	commandModule: CommandModule = new CommandModule(this);
+	commandModule: MediumCommandModule = new MediumCommandModule(this);
 	settingModule: SettingModule = new SettingModule(this);
 
 	async onload() {
@@ -30,7 +30,7 @@ export default class MediumPlugin extends Plugin {
 
 	onunload() {}
 
-	async loadSettings() {
+	private async loadSettings() {
 		await this.settingModule.loadSetting();
 	}
 

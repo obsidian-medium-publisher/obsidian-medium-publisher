@@ -17,15 +17,14 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Medium Developer Secret")
-			.setDesc("Don't know how to get it? Click Logo in the left ribbon!")
+			.setDesc("It's a secret")
 			.addText((text) =>
 				text
 					.setPlaceholder("Enter your secret")
-					.setValue(
-						this.plugin.settingModule.getSetting().mediumDevToken,
-					)
+					// .setValue(this.plugin.settings.mySetting)
+					.setValue(this.plugin.settingModule.settings.mySetting)
 					.onChange(async (value) => {
-						this.plugin.settingModule.setMediumDevToken(value);
+						this.plugin.settingModule.settings.mySetting = value;
 						await this.plugin.saveSettings();
 					}),
 			);
